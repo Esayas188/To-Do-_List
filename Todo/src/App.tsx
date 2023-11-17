@@ -1,4 +1,5 @@
-import {FC,ChangeEvent,useState} from 'react'
+import {FC,ChangeEvent,useState, useEffect} from 'react'
+import {v4 as uuidv4} from 'uuid';
 import './App.css'
 import { ITask } from './Interfaces';
 import TodoTask from './component/TodoTask';
@@ -11,6 +12,22 @@ const App:FC = () => {
   const [formError, setFormError] = useState<string>("")
 
 
+  useEffect(() => {
+    // Retrieve tasks from local storage on initial render
+   const tasksFromLocalStorage = localStorage.getItem('tasks');
+   if (tasksFromLocalStorage) {
+     const parsedTasks: ITask[] = JSON.parse(tasksFromLocalStorage);
+     settaskList(parsedTasks);
+    }
+  }, []);
+  
+  useEffect(() => {
+    if(taskList?.length) { // only store the state if products exists and it's length is greater than 0
+      localStorage.setItem('tasks', JSON.stringify(taskList));
+    }
+  }, [taskList]);
+
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void =>{
 
       setTask(event.target.value);
@@ -21,34 +38,39 @@ const App:FC = () => {
       setdescription(event.target.value);
   };
 
+
+
   const addTask = ():void =>{
     if (task && description){
-      const newTask = { taskName: task, description:description, completed:completed};
-      console.log('this is completed:',completed)
-      settaskList([...taskList,newTask]);
+      const newTask = { taskName: task, description:description, completed:completed,id: uuidv4()};
+      settaskList((prevTaskList) => [...prevTaskList, newTask]);
+      
       setTask("");
       setcompleted(false);
       setdescription("");
       setFormError("")
+      // Update tasks in local storage
+
 
     }else{
       setFormError("All fields required.")
     }
 
   }
-  const deleteTask = (taskNameToDelete: string): void => {
+  const deleteTask = (taskIdToDelete: string): void => {
     settaskList(taskList.filter((task) => {
-        return task.taskName != taskNameToDelete;
+        return task.id != taskIdToDelete;
       })
     );
+    
   };
-  const updateTask = (taskNameToUpdate: string,): void => {
+  const updateTask = (taskIdToUpdate: string,): void => {
     settaskList(taskList.map((task) => {
-      if (task.taskName === taskNameToUpdate) {
+      if (task.id === taskIdToUpdate) {
         return { ...task, completed: !task.completed  }; 
-        // Update completed status
+
       } else {
-        return task; // Keep other tasks unchanged
+        return task; 
       }
     }));
   };
@@ -58,8 +80,8 @@ const App:FC = () => {
 
   return (
     <>
-    <div className='min-h-screen text-white bg-gray-800 grid grid-cols-5 p-[50px]'>
-      <div className=' w-full h-full col-span-2  '>
+    <div className='min-h-screen text-white bg-gray-800 grid grid-cols-1 md:grid-cols-5 gap-8 p-[50px]'>
+      <div className=' w-full h-full md:col-span-2 flex justify-center items-center '>
         <div className="max-w-[450px] border border-gray-500  p-8 rounded-lg">
           <h2 className="text-2xl font-bold text-white mb-6 text-center">Create new tasks</h2>
           {formError && <p className='text-red-400 text-sm'>{formError}</p>}
@@ -114,7 +136,7 @@ const App:FC = () => {
 
       </div>
 
-      <div className=' w-full h-full col-span-3 p-[50px] rounded-md border border-gray-500  '>
+      <div className=' w-full h-full md:col-span-3  p-[10px] sm:p-[50px] rounded-md border border-gray-500  '>
       
       {taskList.map((task:ITask, key:number) => {
           return <TodoTask key={key} task={task} deleteTask={deleteTask} updateTask={updateTask}/>;
