@@ -58,8 +58,8 @@ const App:FC = () => {
 
   return (
     <>
-    <div className='min-h-screen grid grid-cols-5 '>
-      <div className='bg-gray-800 w-full h-full col-span-2'>
+    <div className='min-h-screen text-white bg-gray-800 grid grid-cols-5 p-[50px]'>
+      <div className=' w-full h-full col-span-2  '>
         <div className="max-w-[450px] border border-gray-500  p-8 rounded-lg">
           <h2 className="text-2xl font-bold text-white mb-6 text-center">Create new tasks</h2>
           {formError && <p className='text-red-400 text-sm'>{formError}</p>}
@@ -98,10 +98,10 @@ const App:FC = () => {
               Completed</label>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end ">
             <button className="bg-gradient-to-r from-purple-600 via-purple-400 to-blue-500 text-white px-4 py-2 font-bold rounded-md hover:opacity-80"
               onClick={addTask}>
-              Submit
+              Add Task
             </button>
           </div>
 
@@ -114,7 +114,8 @@ const App:FC = () => {
 
       </div>
 
-      <div className='bg-yellow-200 w-full h-full col-span-3'>
+      <div className=' w-full h-full col-span-3 p-[50px] rounded-md border border-gray-500  '>
+      
       {taskList.map((task:ITask, key:number) => {
           return <TodoTask key={key} task={task} deleteTask={deleteTask} updateTask={updateTask}/>;
         })}
