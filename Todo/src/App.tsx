@@ -10,6 +10,8 @@ const App:FC = () => {
   const [completed, setcompleted] = useState<boolean>(false);
   const [taskList,settaskList] = useState<ITask[]>([]);
   const [formError, setFormError] = useState<string>("")
+  const [deleted, setDeleted] = useState<string>("")
+
 
 
   useEffect(() => {
@@ -21,11 +23,13 @@ const App:FC = () => {
     }
   }, []);
   
-  useEffect(() => {
-    if(taskList?.length) { // only store the state if products exists and it's length is greater than 0
-      localStorage.setItem('tasks', JSON.stringify(taskList));
-    }
-  }, [taskList]);
+useEffect(() => {
+  if (taskList?.length) {
+    localStorage.setItem('tasks', JSON.stringify(taskList));
+  } else {
+    localStorage.removeItem('tasks'); // Remove the 'tasks' key from local storage if the task list is empty
+  }
+}, [taskList]);
 
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void =>{
@@ -139,7 +143,7 @@ const App:FC = () => {
       <div className=' w-full h-full md:col-span-3  p-[10px] sm:p-[50px] rounded-md border border-gray-500  '>
       
       {taskList.map((task:ITask, key:number) => {
-          return <TodoTask key={key} task={task} deleteTask={deleteTask} updateTask={updateTask}/>;
+          return <TodoTask key={key} task={task} deleteTask={deleteTask}  updateTask={updateTask}/>;
         })}
 
       </div>
