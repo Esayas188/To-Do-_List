@@ -8,9 +8,11 @@ const App:FC = () => {
   const [task, setTask] = useState<string>("");
   const [description,setdescription] = useState<string>("");
   const [completed, setcompleted] = useState<boolean>(false);
+  const [personal, setPersonal] = useState<boolean>(false);
+
   const [taskList,settaskList] = useState<ITask[]>([]);
   const [formError, setFormError] = useState<string>("")
-  const [deleted, setDeleted] = useState<string>("")
+  
 
 
 
@@ -46,11 +48,12 @@ useEffect(() => {
 
   const addTask = ():void =>{
     if (task && description){
-      const newTask = { taskName: task, description:description, completed:completed,id: uuidv4()};
+      const newTask = { taskName: task, description:description, completed:completed,id: uuidv4(),personal:personal};
       settaskList((prevTaskList) => [...prevTaskList, newTask]);
       
       setTask("");
       setcompleted(false);
+      setPersonal(false);
       setdescription("");
       setFormError("")
       // Update tasks in local storage
@@ -122,6 +125,16 @@ useEffect(() => {
               onChange={() => setcompleted((prev) => !prev)}
               />
               Completed</label>
+              
+          </div>
+          <div className="pt-2">
+            <label className="text-white flex gap-2 items-center"> 
+              <input className="dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 w-8 h-8" type="checkbox"
+              name='personal'
+              checked={personal}
+              onChange={() => setPersonal((prev) => !prev)}
+              />
+              Personal</label>
           </div>
 
           <div className="flex justify-end ">
@@ -139,12 +152,24 @@ useEffect(() => {
 
 
       </div>
-
-      <div className=' w-full h-full md:col-span-3  p-[10px] sm:p-[50px] rounded-md border border-gray-500  '>
       
-      {taskList.map((task:ITask, key:number) => {
-          return <TodoTask key={key} task={task} deleteTask={deleteTask}  updateTask={updateTask}/>;
-        })}
+      <div className=' w-full h-full md:col-span-3  p-[10px] sm:p-[50px] rounded-md border border-gray-500  '>
+      <div>
+        <p className='pb-1'>Personal</p>
+      {taskList.filter((task:ITask) => task.personal).map((task) => (
+            <TodoTask key={task.id} task={task} deleteTask={deleteTask} updateTask={updateTask}/>
+          ))}
+
+      </div>
+      <div className='pt-[60px]'>
+        <p className='pb-1'>For Work</p>
+        {taskList.filter((task:ITask) => !task.personal).map((task) => (
+            <TodoTask key={task.id} task={task} deleteTask={deleteTask} updateTask={updateTask}/>
+          ))}
+
+      </div>
+
+
 
       </div>
 
